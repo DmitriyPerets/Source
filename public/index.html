@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SOURCE</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="gate">
+  <p class="muted">Presence required.</p>
+  <button id="enter" disabled>ENTER CONTEXT</button>
+</div>
+
+<script>
+let clicks = 0;
+const btn = document.getElementById('enter');
+
+document.addEventListener('click', () => {
+  clicks++;
+  if (clicks >= 7) {
+    btn.disabled = false;
+    btn.classList.add('active');
+  }
+});
+
+btn.onclick = () => {
+  sessionStorage.setItem('source_access', '1');
+  location.href = '/context.html';
+};
+</script>
+
+</body>
+</html>

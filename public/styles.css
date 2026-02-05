@@ -1,0 +1,36 @@
+:root {
+  --bg:#050505;
+  --fg:#e5e5e5;
+  --muted:#7a7a7a;
+}
+
+* { box-sizing:border-box }
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:Inter,system-ui,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+main,.gate { text-align:center }
+
+button {
+  background:none;
+  border:1px solid rgba(255,255,255,.15);
+  color:var(--muted);
+  padding:12px 18px;
+  letter-spacing:.22em;
+  cursor:pointer;
+}
+
+button.active,button:hover {
+  color:var(--fg);
+  border-color:var(--fg);
+}
+
+.muted { color:var(--muted); margin-bottom:24px }

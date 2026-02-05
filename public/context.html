@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOURCE — Context</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+
+<!-- ACCESS CHECK -->
+<script>
+  if (sessionStorage.getItem('source_access') !== '1') {
+    window.location.replace('/');
+  }
+</script>
+
+<main>
+  <h1>SOURCE</h1>
+  <p id="status" class="muted">Checking status…</p>
+  <button id="action" style="display:none;"></button>
+</main>
+
+<script>
+/* =========================
+   WALLET FIXATION (MVP)
+========================= */
+function getWalletId() {
+  let id = localStorage.getItem('source_wallet');
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem('source_wallet', id);
+  }
+  return id;
+}
+
+const wallet = getWalletId();
+
+/* =========================
+   API HELPER
+========================= */
+async function api(url, body) {
+  // artificial latency (anti-bot UX)
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 400));
+
+  const res = await fetch(url, {
+    method: body ? 'POST' : 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-wallet': wallet
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+
+  return res.json();
+}
+
+/* =========================
+   UI LOGIC
+========================= */
+const statusEl = document.getElementById('status');
+const actionBtn = document.getElementById('action');
+
+async function load() {
+  const data = await api('/api/queue/status');
+
+  // пользователь ещё не в очереди
+  if (!data.status) {
+    statusEl.textContent = 'Participation is open.';
+    actionBtn.textContent = 'ENTER QUEUE';
+    actionBtn.style.display = 'inline-block';
+    actionBtn.onclick = async () => {
+      actionBtn.disabled = true;
+      await api('/api/queue/entry', {});
+      load();
+    };
+    return;
+  }
+
+  // пользователь в очереди
+  statusEl.textContent = `Status: ${data.status.toUpperCase()}`;
+
+  if (data.status === 'active') {
+    actionBtn.textContent = 'PARTICIPATE';
+    actionBtn.style.display = 'inline-block';
+    actionBtn.onclick = async () => {
+      actionBtn.disabled = true;
+      await api('/api/queue/participate', {});
+      load();
+    };
+  } else {
+    actionBtn.style.display = 'none';
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
